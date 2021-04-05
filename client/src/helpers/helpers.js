@@ -549,7 +549,11 @@ export const isIpInCidr = (ip, cidr) => {
     }
 };
 
-// TODO call isIpMatchCidr with results of this function in dhcp validation
+/**
+ *
+ * @param {string} subnetMask
+ * @returns {*}
+ */
 export const subnetMaskToBitMask = (subnetMask) => subnetMask
     .split('.')
     .reduce((acc, cur) => acc - Math.log2(256 - Number(cur)), 32);

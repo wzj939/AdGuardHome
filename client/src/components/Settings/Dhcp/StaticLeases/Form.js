@@ -2,11 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Field, reduxForm } from 'redux-form';
 import { Trans, useTranslation } from 'react-i18next';
-import { useDispatch } from 'react-redux';
+import { shallowEqual, useDispatch, useSelector } from 'react-redux';
 import { renderInputField } from '../../../../helpers/form';
-import { validateIpv4, validateMac, validateRequiredValue } from '../../../../helpers/validators';
+import {
+    validateIpv4,
+    validateMac,
+    validateRequiredValue,
+    createValidateIpv4InCidr,
+} from '../../../../helpers/validators';
 import { FORM_NAME } from '../../../../helpers/constants';
 import { toggleLeaseModal } from '../../../../actions';
+import { subnetMaskToBitMask } from '../../../../helpers/helpers';
 
 const Form = ({
     handleSubmit,
@@ -17,11 +23,15 @@ const Form = ({
 }) => {
     const { t } = useTranslation();
     const dispatch = useDispatch();
+    const dhcp = useSelector((state) => state.form[FORM_NAME.DHCPv4], shallowEqual);
 
     const onClick = () => {
         reset();
         dispatch(toggleLeaseModal());
     };
+
+    const cidr = `${dhcp?.values?.v4?.gateway_ip}/${subnetMaskToBitMask(dhcp?.values?.v4?.subnet_mask)}`;
+    const validateIpv4InCidr = createValidateIpv4InCidr(cidr);
 
     return (
         <form onSubmit={handleSubmit}>
@@ -44,8 +54,8 @@ const Form = ({
                         component={renderInputField}
                         type="text"
                         className="form-control"
-                        placeholder={t('form_enter_ip')}
-                        validate={[validateRequiredValue, validateIpv4]}
+                        placeholder={t('form_enter_subnet_ip', { cidr })}
+                        validate={[validateRequiredValue, validateIpv4, validateIpv4InCidr]}
                     />
                 </div>
                 <div className="form__group">

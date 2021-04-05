@@ -1,3 +1,4 @@
+import i18next from 'i18next';
 import {
     MAX_PORT,
     R_CIDR,
@@ -13,6 +14,7 @@ import {
     R_DOMAIN,
 } from './constants';
 import { ip4ToInt, isValidAbsolutePath } from './form';
+import { isIpInCidr } from './helpers';
 
 // Validation functions
 // https://redux-form.com/8.3.0/examples/fieldlevelvalidation/
@@ -222,6 +224,17 @@ export const validateAnswer = (value) => {
 export const validatePath = (value) => {
     if (value && !isValidAbsolutePath(value) && !R_URL_REQUIRES_PROTOCOL.test(value)) {
         return 'form_error_url_or_path_format';
+    }
+    return undefined;
+};
+
+/**
+ * @param cidr {string}
+ * @returns {Function}
+ */
+export const createValidateIpv4InCidr = (cidr) => (valueIp) => {
+    if (!isIpInCidr(valueIp, cidr)) {
+        return i18next.t('form_error_subnet', { ip: valueIp, cidr });
     }
     return undefined;
 };

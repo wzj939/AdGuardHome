@@ -449,7 +449,7 @@ describe('subnetMaskToBitMask', () => {
         '255.255.255.255',
     ];
 
-    test('subnetMaskToBitMask', () => {
+    test('correct for all subnetMasks', () => {
         expect(
             subnetMasks.map((subnetMask) => {
                 const bitmask = subnetMaskToBitMask(subnetMask);
